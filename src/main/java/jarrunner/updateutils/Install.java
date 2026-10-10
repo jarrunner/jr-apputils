@@ -292,6 +292,7 @@ public final class Install {
         removeMade(receipt, true, s -> { problems.add(s); log.accept("problem: " + s); });
         try {
             Files.deleteIfExists(receiptFile(app));
+            deleteIfEmpty(receiptFile(app).getParent(), receipt);
         } catch (IOException e) {
             problems.add("could not remove the receipt: " + e.getMessage());
         }
@@ -325,6 +326,10 @@ public final class Install {
                         var isProgram = !(lower.endsWith(".lnk") || lower.endsWith(".desktop") || lower.endsWith(".plist") || lower.endsWith(".app"));
                         if (!all && isProgram) break;
                         deleteOrSetAside(f);
+                        if (all && isProgram) { // and what an update left beside it, and the folder if that empties it
+                            Files.deleteIfExists(f.resolveSibling(f.getFileName() + ".jr-replaced"));
+                            deleteIfEmpty(f.getParent(), receipt);
+                        }
                     }
                     case "dir" -> { if (all) deleteTree(Path.of(at)); }
                     default -> { }
@@ -386,6 +391,16 @@ public final class Install {
             Files.deleteIfExists(aside);
             Files.move(f, aside);
         }
+    }
+
+    /** Removes dir when it is empty and named after the app (its install or data folder), never a shared folder
+     *  such as ~/.local/bin or the Desktop. */
+    private static void deleteIfEmpty(Path dir, Map<String, Object> receipt) throws IOException {
+        if (dir == null || dir.getFileName() == null || !dir.getFileName().toString().equals(receipt.get("app"))) return;
+        try (var entries = Files.list(dir)) {
+            if (entries.findAny().isPresent()) return;
+        }
+        Files.deleteIfExists(dir);
     }
 
     private static void deleteTree(Path dir) throws IOException {
