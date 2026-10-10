@@ -195,6 +195,7 @@ public final class Install {
         if (onPath) step(problems, "PATH", () -> pathInProfile(Places.home().resolve(".zprofile"), made));
         if (desktopShortcut && bundle != null) step(problems, "Desktop link", () -> {
             var l = Places.desktopDir().resolve(bundle.getFileName());
+            Files.createDirectories(l.getParent());
             Files.deleteIfExists(l);
             Files.createSymbolicLink(l, bundle);
             made.add(item("file", l));

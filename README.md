@@ -47,6 +47,8 @@ When the app is not running under jr (from an IDE, or `java -jar`), `Updater` re
 - **macOS:** has jr write the app (`<exe> -Xjr:install`): `~/Applications/<Name>.app` from the Info.plist and icon the binary carries, and `~/.local/bin/<app>` linking to the binary inside it, so the same file is the app in Finder, Launchpad and the Dock, and the command in a terminal. Adds `~/.local/bin` to PATH in `~/.zprofile` if no shell has it. A Desktop link and a LaunchAgent if asked.
 - **Linux:** copies the binary to `~/.local/bin`, adds that to PATH in `~/.profile` if needed, and writes `.desktop` entries for the menu, the Desktop and autostart as asked.
 
+Tested by hand with the round trips in `tests/`: `RoundTrip.java` on Windows 11, and `RoundTripMac.java` on macOS 26 (Apple silicon) in a scratch home, with a jr-maven-plugin-built binary. Linux has not been run yet.
+
 ## Native access
 
 On Windows the registry, known folders and shortcuts are reached through `java.lang.foreign`. Give the app `--enable-native-access=ALL-UNNAMED` (or its module name) in its jr config's `vm.args`, or the JVM prints a warning the first time.
