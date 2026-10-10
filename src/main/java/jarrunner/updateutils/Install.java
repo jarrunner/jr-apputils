@@ -157,6 +157,12 @@ public final class Install {
         return true;
     }
 
+    /** Takes a folder off the user PATH (Windows; elsewhere it does nothing): for moving an app off a layout an
+     *  older version of it used. True if the PATH changed. */
+    public static boolean removeFromUserPath(Path dir) {
+        return Places.os() == Places.Os.WINDOWS && winPathRemove(dir);
+    }
+
     static boolean winPathRemove(Path dir) {
         var raw = WinNative.regGet("Environment", "Path");
         if (raw == null) return false;
