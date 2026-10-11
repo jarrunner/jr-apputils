@@ -1,4 +1,29 @@
+<p align="center"><img src="https://jarrunner.github.io/jr-icon.svg" width="96" alt="jr"></p>
+
 # jr-apputils
+
+Give your Java app its own `install` and `update` commands, with no installer. Your user downloads one file, runs `myapp install`, and later `myapp update`.
+
+- **`install`** puts the app in the user's standard place, on PATH, with shortcuts, on Windows, macOS and Linux. No administrator rights.
+- **`update`** has [jr](https://github.com/jarrunner/jr) check the next version's SHA-256 and swap the exe, even while it runs.
+- **A polite update notice** at startup, checked at most once a day, without waiting on the network.
+- **No dependencies.** Java 25. Everything returns a result; nothing throws when the app runs outside jr.
+
+**Try it:** today it is `1.0-SNAPSHOT` on the Central snapshot repository (add `https://central.sonatype.com/repository/maven-snapshots/` to your repositories), then:
+
+```xml
+<dependency>
+  <groupId>io.github.jarrunner</groupId>
+  <artifactId>jr-apputils</artifactId>
+  <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+
+and add the `switch` from [An app's update and install commands](#an-apps-update-and-install-commands) to your `main`. Build the exe with [jr-maven-plugin](https://github.com/jarrunner/jr-maven-plugin).
+
+[jr](https://github.com/jarrunner/jr) · [jr-maven-plugin](https://github.com/jarrunner/jr-maven-plugin) · [The app convention](https://github.com/jarrunner/jr/blob/main/docs/apps.md) · [jarrunner.github.io](https://jarrunner.github.io)
+
+## What it is
 
 The library for an app launched by [jr](https://github.com/jarrunner/jr): `io.github.jarrunner:jr-apputils`, package `jarrunner.jr.apputils`. One file is the whole app: the user downloads it, runs `myapp install`, and later `myapp update`. No installer, no script. (It replaces two earlier libraries, jr-runtime and updateutils, merged on 2026-10-11.)
 
