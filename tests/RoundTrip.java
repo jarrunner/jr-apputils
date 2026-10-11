@@ -2,12 +2,12 @@
 // (with a unique test name) and removes all of it again. Windows only. From the repo root, after mvn package:
 //   javac -cp target/classes -d target/rt tests/RoundTrip.java
 //   java --enable-native-access=ALL-UNNAMED -cp "target/classes;target/rt" RoundTrip <scratch>\uu-roundtrip-test <any jr exe>
-import jarrunner.updateutils.*;
+import jarrunner.jr.apputils.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/** updateutils round trip on this machine: install (scratch install dir, real PATH/Start Menu/Desktop/Run with a
+/** jr-apputils round trip on this machine: install (scratch install dir, real PATH/Start Menu/Desktop/Run with a
  *  unique test name), check everything exists, uninstall, check everything is gone. */
 public class RoundTrip {
     static int pass, fail;
@@ -25,8 +25,8 @@ public class RoundTrip {
         ok("not under jr: install refuses with a clear message", Install.app(app).run().problems().get(0).contains("not running from its jr launcher"));
         ok("not under jr: update UNAVAILABLE", Updater.update().status() == UpdateResult.Status.UNAVAILABLE);
 
-        System.setProperty(Jr.EXE_PROPERTY, a[1]);
-        var r = Install.app(app).displayName("UU Roundtrip Test").description("updateutils test").installDir(dir)
+        System.setProperty(JrApp.EXE_PROPERTY, a[1]);
+        var r = Install.app(app).displayName("UU Roundtrip Test").description("jr-apputils test").installDir(dir)
                 .desktopShortcut(true).startAtLogin("--tray").run();
         System.out.println("problems: " + r.problems());
         var exe = dir.resolve(app + ".exe");

@@ -1,4 +1,4 @@
-package jarrunner.updateutils;
+package jarrunner.jr.apputils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -74,8 +74,8 @@ public final class Install {
     }
 
     public Result run() {
-        var exe = Jr.exe();
-        if (exe.isEmpty()) return new Result(null, List.of(Jr.notUnderJr("install itself")));
+        var exe = JrApp.exe();
+        if (exe.isEmpty()) return new Result(null, List.of(JrApp.notUnderJr("install itself")));
         var problems = new ArrayList<String>();
         var receipt = new LinkedHashMap<String, Object>();
         receipt.put("app", app);
@@ -202,7 +202,7 @@ public final class Install {
             log.accept("Desktop: " + bundle.getFileName());
         });
         if (startAtLogin) step(problems, "start at login", () -> {
-            var label = "io.github.jarrunner.updateutils." + app;
+            var label = "io.github.jarrunner.apputils." + app;
             var plist = Places.loginItemsDir().resolve(label + ".plist");
             Files.createDirectories(plist.getParent());
             var args = new StringBuilder("    <string>").append(xml((inApp != null ? inApp : link).toString())).append("</string>\n");
@@ -261,7 +261,7 @@ public final class Install {
 
     /** Adds ~/.local/bin to PATH in a shell profile, unless PATH has it already or the profile already says so. */
     private void pathInProfile(Path profile, List<Object> made) throws IOException {
-        var line = PROFILE_LINE + "  # added by " + app + " (jr updateutils)";
+        var line = PROFILE_LINE + "  # added by " + app + " (jr-apputils)";
         var m = item("profile", profile);
         m.put("line", line);
         var existing = Files.exists(profile) ? Files.readString(profile) : "";

@@ -1,4 +1,4 @@
-package jarrunner.updateutils;
+package jarrunner.jr.apputils;
 
 import java.lang.foreign.AddressLayout;
 import java.lang.foreign.Arena;

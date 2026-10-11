@@ -1,14 +1,14 @@
-// A MANUAL test, not part of the build: updateutils' Install on macOS, in a scratch home so nothing of the real
+// A MANUAL test, not part of the build: jr-apputils' Install on macOS, in a scratch home so nothing of the real
 // account is touched. Needs a jr-maven-plugin-built macOS binary (it carries the app's Info.plist and icon). On a Mac,
 // from the repo root, after mvn package:
 //   javac -cp target/classes -d target/rt tests/RoundTripMac.java
 //   H=$(mktemp -d); HOME=$H java -Duser.home=$H -cp target/classes:target/rt RoundTripMac <macOS binary> "<Display Name>"
-import jarrunner.updateutils.*;
+import jarrunner.jr.apputils.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/** updateutils round trip on macOS: install (the app in ~/Applications, the command link, PATH in ~/.zprofile, a Desktop
+/** jr-apputils round trip on macOS: install (the app in ~/Applications, the command link, PATH in ~/.zprofile, a Desktop
  *  link, a LaunchAgent), check everything exists, reinstall, uninstall, check everything is gone. */
 public class RoundTripMac {
     static int pass, fail;
@@ -26,13 +26,13 @@ public class RoundTripMac {
         if (!System.getenv("HOME").equals(home.toString())) throw new IllegalStateException("run with HOME and user.home both on a scratch folder");
         ok("not under jr: install refuses with a clear message", Install.app(app).run().problems().get(0).contains("not running from its jr launcher"));
 
-        System.setProperty(Jr.EXE_PROPERTY, binary.toString());
+        System.setProperty(JrApp.EXE_PROPERTY, binary.toString());
         var r = Install.app(app).desktopShortcut(true).startAtLogin("--tray").run();
         System.out.println("problems: " + r.problems());
         var bundle = home.resolve("Applications").resolve(name + ".app");
         var link = home.resolve(".local/bin").resolve(app);
         var desk = Places.desktopDir().resolve(name + ".app");
-        var agent = Places.loginItemsDir().resolve("io.github.jarrunner.updateutils." + app + ".plist");
+        var agent = Places.loginItemsDir().resolve("io.github.jarrunner.apputils." + app + ".plist");
         var profile = home.resolve(".zprofile");
         ok("install: no problems", r.ok());
         ok("install: the app in ~/Applications", Files.isRegularFile(bundle.resolve("Contents/Info.plist")) && Files.isExecutable(bundle.resolve("Contents/MacOS").resolve(app)));

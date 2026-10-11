@@ -1,13 +1,13 @@
-# updateutils
+# jr-apputils
 
-Install and update for apps launched by [jr](https://github.com/jarrunner/jr). One file is the whole app: the user downloads it, runs `myapp install`, and later `myapp update`. No installer, no script.
+The library for an app launched by [jr](https://github.com/jarrunner/jr): `io.github.jarrunner:jr-apputils`, package `jarrunner.jr.apputils`. One file is the whole app: the user downloads it, runs `myapp install`, and later `myapp update`. No installer, no script. (It replaces two earlier libraries, jr-runtime and updateutils, merged on 2026-10-11.)
 
 jr already does the parts that must happen outside Java: replacing the running exe safely (`-Xjr:update`), fetching Java and the app's jar, and on macOS writing the `.app` with its icon (`-Xjr:install`). This library does the rest, in Java, once, so every app does not reinvent it:
 
-- `Updater`: the app's own `update` command, done by jr. It runs `<exe> -Xjr:update -Xjr:batch` and reads the one JSON line jr prints.
+- `JrApp`: what jr told the app about itself. jr passes every value of the app's config as a system property `io.github.jarrunner.jr.<path>` (`app.id`, `app.version`, `update.url`, `jvm.mode`, ...) plus `exe`, its own path. `JrApp` gives them names: `launchedByJr()`, `exe()`, `exeName()`, `appBundle()` (macOS), `appId()`, `appVersion()`, `updateUrl()`, `updateChannel()`, `config("any.path")`, `configList("app.args")`. All empty when the app runs without jr.
+- `Updater`: the app's own `update` command, done by jr. It runs `<exe> -Xjr:update -Xjr:batch` and reads the one JSON line jr prints. Also `checkAtMostEvery`, `inBackground` and `notice` for telling the user at startup. Every decision is jr's, so the update rules live in one place.
 - `Install`: the app's own `install` command. It copies the running exe to the user's standard place, puts it on PATH, adds shortcuts and (if asked) starts it at sign-in. It writes a receipt so a reinstall replaces exactly what it made and `uninstall` removes exactly that.
 - `Places`: the standard per-user folders on each OS (install, config, data, cache, logs, desktop, menu, login items), for code whose authors do not know every OS's conventions.
-- `Jr`: whether the app runs under jr, and the exe it was launched from.
 
 No dependencies. Java 25. No administrator rights are ever needed.
 
@@ -40,6 +40,19 @@ if (check.status() == UpdateResult.Status.NEWER) {
 ```
 
 When the app is not running under jr (from an IDE, or `java -jar`), `Updater` returns `UNAVAILABLE` and `Install` returns a problem saying so. Neither throws.
+
+## Telling the user a new version is out
+
+At startup, without waiting on the network, and at most once a day (the result is kept in `~/.jr/update-check/`):
+
+```java
+Updater.inBackground(Duration.ofDays(1), r -> {
+    var line = Updater.notice(r, "update");     // "myapp 1.1 is available (this is 1.0): run myapp update"
+    if (line != null) System.err.println(line);  // stderr: stdout may be data
+});
+```
+
+A window app shows the same result its own way, in a status line or its about box.
 
 ## What install does on each OS
 

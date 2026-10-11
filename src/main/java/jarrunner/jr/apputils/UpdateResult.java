@@ -1,4 +1,4 @@
-package jarrunner.updateutils;
+package jarrunner.jr.apputils;
 
 /** What a check or an update came to, as jr reported it (-Xjr:batch).
  *  @param status   CURRENT, NEWER (check only), UPDATED, ERROR, or UNAVAILABLE when the app is not running under jr

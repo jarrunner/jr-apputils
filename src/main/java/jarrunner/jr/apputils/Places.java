@@ -1,4 +1,4 @@
-package jarrunner.updateutils;
+package jarrunner.jr.apputils;
 
 import java.nio.file.Path;
 import java.util.Locale;

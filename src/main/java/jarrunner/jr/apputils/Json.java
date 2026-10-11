@@ -1,4 +1,4 @@
-package jarrunner.updateutils;
+package jarrunner.jr.apputils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
