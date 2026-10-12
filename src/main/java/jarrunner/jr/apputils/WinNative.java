@@ -73,10 +73,13 @@ final class WinNative {
         return s;
     }
 
+    /** Create the folder if it does not exist yet: a fresh profile has no %LOCALAPPDATA%\Programs, and without this flag the call fails with 0x80070002. */
+    private static final int KF_FLAG_CREATE = 0x8000;
+
     static Path knownFolder(String id) {
         try (var a = Arena.ofConfined()) {
             var out = a.allocate(PTR);
-            var hr = (int) SH_GET_KNOWN_FOLDER_PATH.invokeExact(guid(a, id), 0, MemorySegment.NULL, out);
+            var hr = (int) SH_GET_KNOWN_FOLDER_PATH.invokeExact(guid(a, id), KF_FLAG_CREATE, MemorySegment.NULL, out);
             var p = out.get(PTR, 0);
             try {
                 if (hr != 0) throw new IllegalStateException("SHGetKnownFolderPath(" + id + ") failed: 0x" + Integer.toHexString(hr));

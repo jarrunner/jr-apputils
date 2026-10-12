@@ -29,7 +29,7 @@ import java.util.function.Consumer;
  *      writes Start Menu and (if asked) Desktop shortcuts, and (if asked) a Run entry to start at sign-in.</li>
  *  <li>macOS: has jr write the app (&lt;exe&gt; -Xjr:install: ~/Applications/&lt;Name&gt;.app from the Info.plist and icon the
  *      binary carries, and ~/.local/bin/&lt;app&gt; linking to it), adds ~/.local/bin to PATH in ~/.zprofile if no shell
- *      has it, and (if asked) a Desktop link to the app and a LaunchAgent.</li>
+ *      has it (and, for a user whose login shell is bash, in the file bash reads at login), and (if asked) a Desktop link to the app and a LaunchAgent.</li>
  *  <li>Linux: copies the binary to ~/.local/bin, adds that to PATH in ~/.profile if needed, and writes .desktop
  *      entries for the menu, the Desktop and autostart as asked.</li>
  *  </ul>
@@ -193,6 +193,7 @@ public final class Install {
         var bundle = inApp == null ? null : bundleOf(inApp);
         if (bundle != null) made.add(item("dir", bundle));
         if (onPath) step(problems, "PATH", () -> pathInProfile(Places.home().resolve(".zprofile"), made));
+        if (onPath && String.valueOf(System.getenv("SHELL")).endsWith("/bash")) step(problems, "PATH (bash)", () -> pathInProfile(bashLoginProfile(), made));
         if (desktopShortcut && bundle != null) step(problems, "Desktop link", () -> {
             var l = Places.desktopDir().resolve(bundle.getFileName());
             Files.createDirectories(l.getParent());
@@ -260,6 +261,14 @@ public final class Install {
     private static final String PROFILE_LINE = "export PATH=\"$HOME/.local/bin:$PATH\"";
 
     /** Adds ~/.local/bin to PATH in a shell profile, unless PATH has it already or the profile already says so. */
+    /** The file a bash login shell reads: the first of ~/.bash_profile, ~/.bash_login that exists, else ~/.profile.
+     *  Never a new ~/.bash_profile, which would make bash stop reading the user's ~/.profile. */
+    private static Path bashLoginProfile() {
+        var home = Places.home();
+        for (var n : new String[] {".bash_profile", ".bash_login"}) if (Files.exists(home.resolve(n))) return home.resolve(n);
+        return home.resolve(".profile");
+    }
+
     private void pathInProfile(Path profile, List<Object> made) throws IOException {
         var line = PROFILE_LINE + "  # added by " + app + " (jr-apputils)";
         var m = item("profile", profile);
