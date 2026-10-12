@@ -1,0 +1,43 @@
+# Install with the default folder on a Windows profile that has no %LOCALAPPDATA%\Programs (tests/FreshProfile.java).
+# A throwaway runner is the only safe place: the test writes the real user PATH, Start Menu and Desktop.
+# workflow_dispatch with a ref (e.g. v1.0) runs it against an older version: on v1.0 it must fail (PRP-48).
+name: fresh-profile
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: tag or commit to test (empty for the pushed one)
+        default: ''
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+      # The test from this commit, whatever ref is being tested, so an old version can be tested with the new test.
+      - uses: actions/checkout@v5
+        with:
+          path: current
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: build
+        run: mvn -B -ntp -DskipTests package
+      - name: a fresh profile, and a jr exe to install
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Programs" -ErrorAction SilentlyContinue
+          curl.exe -fsSL -o "$env:RUNNER_TEMP\jr.exe" https://github.com/jarrunner/jr/releases/download/v1.4.0/jr-windows-x86_64.exe
+      - name: install with the default folder
+        shell: pwsh
+        run: |
+          javac -cp target/classes -d target/fp current/tests/FreshProfile.java
+          java --enable-native-access=ALL-UNNAMED -cp "target/classes;target/fp" FreshProfile "$env:RUNNER_TEMP\jr.exe"
