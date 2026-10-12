@@ -184,7 +184,7 @@ public final class Install {
     // ---- macOS ----
 
     private Path macos(Path exe, List<Object> made, List<String> problems) throws IOException {
-        var out = runJr(exe, "-Xjr:install");
+        var out = runJr(exe, "-Xjr:install", "-Xjr:batch"); // batch: no dialogs, and jr leaves the PATH advice to us
         for (var l : out.text.split("\n")) if (!l.isBlank()) log.accept(l.strip());
         if (out.code != 0) throw new IOException("the app could not be written (" + exe + " -Xjr:install, exit " + out.code + ")");
         var link = Places.home().resolve(".local/bin").resolve(app);
@@ -441,9 +441,12 @@ public final class Install {
 
     private record Output(int code, String text) {}
 
-    private static Output runJr(Path exe, String flag) throws IOException {
+    private static Output runJr(Path exe, String... flags) throws IOException {
         try {
-            var p = new ProcessBuilder(exe.toString(), flag).redirectErrorStream(true).start();
+            var cmd = new ArrayList<String>();
+            cmd.add(exe.toString());
+            cmd.addAll(List.of(flags));
+            var p = new ProcessBuilder(cmd).redirectErrorStream(true).start();
             var text = new String(p.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             return new Output(p.waitFor(), text);
         } catch (InterruptedException e) {
