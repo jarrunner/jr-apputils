@@ -9,13 +9,13 @@ Give your Java app its own `install` and `update` commands, with no installer. Y
 - **A polite update notice** at startup, checked at most once a day, without waiting on the network.
 - **No dependencies.** Java 25. Everything returns a result; nothing throws when the app runs outside jr.
 
-**Try it:** today it is `1.0-SNAPSHOT` on the Central snapshot repository (add `https://central.sonatype.com/repository/maven-snapshots/` to your repositories), then:
+**Try it:** it is on Maven Central as `io.github.jarrunner:jr-apputils:1.0`:
 
 ```xml
 <dependency>
   <groupId>io.github.jarrunner</groupId>
   <artifactId>jr-apputils</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 </dependency>
 ```
 
@@ -97,4 +97,4 @@ Build the exe with [jr-maven-plugin](https://github.com/jarrunner/jr-maven-plugi
 
 ## Version
 
-`1.0-SNAPSHOT`, published to the Central snapshot repository (`https://central.sonatype.com/repository/maven-snapshots/`).
+`1.0`, on Maven Central (`io.github.jarrunner:jr-apputils:1.0`). Work in progress between releases is published as `-SNAPSHOT` versions to the Central snapshot repository (`https://central.sonatype.com/repository/maven-snapshots/`).
