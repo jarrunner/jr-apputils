@@ -1,5 +1,6 @@
 // A MANUAL test, not part of the build: it really writes to this user's PATH, Start Menu, Desktop and HKCU Run key
-// (with a unique test name) and removes all of it again. Windows only. From the repo root, after mvn package:
+// (with a unique test name) and removes all of it again. Windows only. It passes installDir, so it never resolves the
+// default install folder: FreshProfile.java (CI, fresh-profile.yml) covers that. From the repo root, after mvn package:
 //   javac -cp target/classes -d target/rt tests/RoundTrip.java
 //   java --enable-native-access=ALL-UNNAMED -cp "target/classes;target/rt" RoundTrip <scratch>\uu-roundtrip-test <any jr exe>
 import jarrunner.jr.apputils.*;
